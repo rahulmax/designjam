@@ -17,7 +17,7 @@ interface Topic {
 interface TopicListProps {
   topics: Topic[];
   isAdmin: boolean;
-  currentUserId: string;
+  currentUserId: string | null;
 }
 
 export function TopicList({ topics, isAdmin, currentUserId }: TopicListProps) {

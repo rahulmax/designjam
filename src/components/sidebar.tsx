@@ -1,5 +1,6 @@
 import { auth, signOut } from "@/lib/auth";
 import { LogOut } from "lucide-react";
+import Link from "next/link";
 
 export async function Sidebar() {
   const session = await auth();
@@ -47,32 +48,44 @@ export async function Sidebar() {
 
       {/* Bottom - User */}
       <div className="border-t border-jam-border px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-2.5 w-2.5 bg-jam-yellow" />
-            <span className="font-mono text-xs font-bold tracking-wider text-jam-text-primary">
-              {user?.name?.toUpperCase() ?? "USER"}
-            </span>
-            {isAdmin && (
-              <span className="bg-jam-orange px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider text-jam-text-on-accent">
-                ADMIN
+        {user ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-2.5 w-2.5 bg-jam-yellow" />
+              <span className="font-mono text-xs font-bold tracking-wider text-jam-text-primary">
+                {user.name?.toUpperCase() ?? "USER"}
               </span>
-            )}
-          </div>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <button
-              type="submit"
-              className="text-jam-text-secondary transition-colors hover:text-jam-text-primary"
+              {isAdmin && (
+                <span className="bg-jam-orange px-2 py-0.5 font-mono text-[9px] font-bold tracking-wider text-jam-text-on-accent">
+                  ADMIN
+                </span>
+              )}
+            </div>
+            <form
+              action={async () => {
+                "use server";
+                await signOut({ redirectTo: "/login" });
+              }}
             >
-              <LogOut size={14} />
-            </button>
-          </form>
-        </div>
+              <button
+                type="submit"
+                className="text-jam-text-secondary transition-colors hover:text-jam-text-primary"
+              >
+                <LogOut size={14} />
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="flex items-center gap-3 transition-colors hover:opacity-80"
+          >
+            <div className="h-2.5 w-2.5 bg-jam-text-secondary" />
+            <span className="font-mono text-xs font-bold tracking-wider text-jam-text-secondary">
+              SIGN IN
+            </span>
+          </Link>
+        )}
       </div>
     </aside>
   );

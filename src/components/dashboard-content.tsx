@@ -21,7 +21,7 @@ interface DashboardContentProps {
   doneTopics: Topic[];
   stats: { topics: number; votes: number; discussions: number };
   isAdmin: boolean;
-  currentUserId: string;
+  currentUserId: string | null;
 }
 
 export function DashboardContent({
@@ -46,7 +46,7 @@ export function DashboardContent({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <SubmitTopicDialog />
+          <SubmitTopicDialog isLoggedIn={!!currentUserId} />
         </div>
       </div>
 

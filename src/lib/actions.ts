@@ -131,7 +131,7 @@ export async function vote(topicId: string, action: "up" | "down") {
 
 export async function getTopics(status: "open" | "done") {
   const session = await auth();
-  if (!session?.user?.id) return [];
+  const userId = session?.user?.id;
 
   const topics = await prisma.topic.findMany({
     where: { status },
@@ -148,7 +148,9 @@ export async function getTopics(status: "open" | "done") {
   // Calculate totals and sort open topics by total votes desc, then createdAt asc
   const enriched = topics.map((topic) => {
     const totalVotes = topic.votes.reduce((sum, v) => sum + v.count, 0);
-    const userVote = topic.votes.find((v) => v.userId === session.user.id);
+    const userVote = userId
+      ? topic.votes.find((v) => v.userId === userId)
+      : undefined;
     return {
       id: topic.id,
       title: topic.title,
@@ -175,9 +177,6 @@ export async function getTopics(status: "open" | "done") {
 }
 
 export async function getStats() {
-  const session = await auth();
-  if (!session?.user?.id) return { topics: 0, votes: 0, discussions: 0 };
-
   const [topicCount, voteAgg, doneCount] = await Promise.all([
     prisma.topic.count({ where: { status: "open" } }),
     prisma.vote.aggregate({

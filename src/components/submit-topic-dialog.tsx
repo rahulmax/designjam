@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -15,11 +16,22 @@ import { Label } from "@/components/ui/label";
 import { createTopic } from "@/lib/actions";
 import { toast } from "sonner";
 
-export function SubmitTopicDialog() {
+interface SubmitTopicDialogProps {
+  isLoggedIn: boolean;
+}
+
+export function SubmitTopicDialog({ isLoggedIn }: SubmitTopicDialogProps) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  function handleClick() {
+    if (!isLoggedIn) {
+      router.push("/login");
+    }
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -41,6 +53,18 @@ export function SubmitTopicDialog() {
         );
       }
     });
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <button
+        onClick={handleClick}
+        className="flex h-10 items-center gap-2.5 bg-jam-yellow px-5 font-sans text-xs font-bold tracking-wider text-jam-text-on-accent transition-opacity hover:opacity-90"
+      >
+        <span>+</span>
+        SUBMIT NEW TOPIC
+      </button>
+    );
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { vote, markTopicDone } from "@/lib/actions";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { EditTopicDialog } from "./edit-topic-dialog";
@@ -20,7 +21,7 @@ interface TopicCardProps {
   };
   rank: number;
   isAdmin: boolean;
-  currentUserId: string;
+  currentUserId: string | null;
 }
 
 export function TopicCard({
@@ -34,10 +35,15 @@ export function TopicCard({
   const [optimisticUserVotes, setOptimisticUserVotes] = useState(
     topic.userVoteCount
   );
+  const router = useRouter();
   const isDone = topic.status === "done";
-  const isOwner = topic.presenter.id === currentUserId;
+  const isOwner = currentUserId ? topic.presenter.id === currentUserId : false;
 
   function handleVote(action: "up" | "down") {
+    if (!currentUserId) {
+      router.push("/login");
+      return;
+    }
     if (isDone) return;
     if (action === "up" && optimisticUserVotes >= 5) {
       toast.error("Maximum 5 votes per topic");
@@ -94,14 +100,14 @@ export function TopicCard({
           <div className="mt-1 flex gap-1">
             <button
               onClick={() => handleVote("up")}
-              disabled={isPending || optimisticUserVotes >= 5}
+              disabled={isPending || (!!currentUserId && optimisticUserVotes >= 5)}
               className="flex h-6 w-7 items-center justify-center bg-jam-yellow font-sans text-sm font-bold text-jam-text-on-accent transition-opacity disabled:opacity-40"
             >
               +
             </button>
             <button
               onClick={() => handleVote("down")}
-              disabled={isPending || optimisticUserVotes <= 0}
+              disabled={isPending || !currentUserId || optimisticUserVotes <= 0}
               className="flex h-6 w-7 items-center justify-center border border-jam-border-secondary font-sans text-sm font-bold text-jam-text-secondary transition-opacity disabled:opacity-40"
             >
               -
@@ -133,7 +139,7 @@ export function TopicCard({
 
       {/* Right Section */}
       <div className="flex shrink-0 flex-col items-end gap-2">
-        {!isDone && (
+        {!isDone && currentUserId && (
           <div className="flex items-center gap-1.5">
             <span className="font-mono text-[9px] font-bold tracking-wider text-jam-text-secondary">
               YOUR VOTES:
