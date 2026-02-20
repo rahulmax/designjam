@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String
+  role              String   @default("user") // "admin" or "user"
+  mustResetPassword Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  topics Topic[]
+  votes  Vote[]
+}
+
+model Topic {
+  id          String    @id @default(cuid())
+  title       String
+  description String
+  status      String    @default("open") // "open" or "done"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  presenterId String
+  presenter   User   @relation(fields: [presenterId], references: [id])
+
+  votes Vote[]
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  count     Int      @default(1) // 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  topicId String
+  topic   Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+}
