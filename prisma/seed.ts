@@ -6,61 +6,56 @@ const prisma = new PrismaClient();
 async function main() {
   const defaultPassword = await hash("asdf1234", 12);
 
+  // Clear existing data (order matters for FK constraints)
+  await prisma.vote.deleteMany();
+  await prisma.topic.deleteMany();
+  await prisma.user.deleteMany();
+
   // Create users
-  const rahul = await prisma.user.upsert({
-    where: { email: "rahul@team.com" },
-    update: {},
-    create: {
+  const rahul = await prisma.user.create({
+    data: {
       name: "Rahul.A",
-      email: "rahul@team.com",
+      email: "rahul.hareendran@dbizsolution.com",
       password: defaultPassword,
       role: "admin",
       mustResetPassword: true,
     },
   });
 
-  const aeishwarya = await prisma.user.upsert({
-    where: { email: "aeishwarya@team.com" },
-    update: {},
-    create: {
+  const aeishwarya = await prisma.user.create({
+    data: {
       name: "Aeishwarya.D",
-      email: "aeishwarya@team.com",
+      email: "aeishwarya.lokhande@dbizsolution.com",
       password: defaultPassword,
       role: "user",
       mustResetPassword: true,
     },
   });
 
-  const james = await prisma.user.upsert({
-    where: { email: "james@team.com" },
-    update: {},
-    create: {
-      name: "James.K",
-      email: "james@team.com",
+  const jaffar = await prisma.user.create({
+    data: {
+      name: "Jaffar.M",
+      email: "jaffar.moideen@dbizsolution.com",
       password: defaultPassword,
       role: "user",
       mustResetPassword: true,
     },
   });
 
-  const priya = await prisma.user.upsert({
-    where: { email: "priya@team.com" },
-    update: {},
-    create: {
-      name: "Priya.M",
-      email: "priya@team.com",
+  const adanna = await prisma.user.create({
+    data: {
+      name: "Adanna.W",
+      email: "adanna.w@dbizsolution.com",
       password: defaultPassword,
       role: "user",
       mustResetPassword: true,
     },
   });
 
-  const sam = await prisma.user.upsert({
-    where: { email: "sam@team.com" },
-    update: {},
-    create: {
-      name: "Sam.T",
-      email: "sam@team.com",
+  const kavya = await prisma.user.create({
+    data: {
+      name: "Kavya.J",
+      email: "kavya.joseph@dbizsolution.com",
       password: defaultPassword,
       role: "user",
       mustResetPassword: true,
@@ -93,7 +88,7 @@ async function main() {
       title: "Design Tokens at Scale: Multi-Brand Systems",
       description:
         "How to architect a design token system that supports multiple brands, themes, and platforms without collapsing under complexity.",
-      presenterId: james.id,
+      presenterId: jaffar.id,
       createdAt: new Date("2026-02-13"),
     },
   });
@@ -103,7 +98,7 @@ async function main() {
       title: "Figma vs. Code: Bridging the Handoff Gap",
       description:
         "Discussing practical strategies to reduce friction between design and engineering during handoff, including design tokens and shared component libraries.",
-      presenterId: priya.id,
+      presenterId: adanna.id,
       createdAt: new Date("2026-02-15"),
     },
   });
@@ -113,27 +108,27 @@ async function main() {
     // Topic 1 - 23 total votes
     { userId: rahul.id, topicId: topic1.id, count: 5 },
     { userId: aeishwarya.id, topicId: topic1.id, count: 5 },
-    { userId: james.id, topicId: topic1.id, count: 5 },
-    { userId: priya.id, topicId: topic1.id, count: 4 },
-    { userId: sam.id, topicId: topic1.id, count: 4 },
+    { userId: jaffar.id, topicId: topic1.id, count: 5 },
+    { userId: adanna.id, topicId: topic1.id, count: 4 },
+    { userId: kavya.id, topicId: topic1.id, count: 4 },
     // Topic 2 - 18 total votes
     { userId: rahul.id, topicId: topic2.id, count: 5 },
     { userId: aeishwarya.id, topicId: topic2.id, count: 4 },
-    { userId: james.id, topicId: topic2.id, count: 3 },
-    { userId: priya.id, topicId: topic2.id, count: 3 },
-    { userId: sam.id, topicId: topic2.id, count: 3 },
+    { userId: jaffar.id, topicId: topic2.id, count: 3 },
+    { userId: adanna.id, topicId: topic2.id, count: 3 },
+    { userId: kavya.id, topicId: topic2.id, count: 3 },
     // Topic 3 - 14 total votes
     { userId: rahul.id, topicId: topic3.id, count: 4 },
     { userId: aeishwarya.id, topicId: topic3.id, count: 3 },
-    { userId: james.id, topicId: topic3.id, count: 3 },
-    { userId: priya.id, topicId: topic3.id, count: 2 },
-    { userId: sam.id, topicId: topic3.id, count: 2 },
+    { userId: jaffar.id, topicId: topic3.id, count: 3 },
+    { userId: adanna.id, topicId: topic3.id, count: 2 },
+    { userId: kavya.id, topicId: topic3.id, count: 2 },
     // Topic 4 - 9 total votes
     { userId: rahul.id, topicId: topic4.id, count: 2 },
     { userId: aeishwarya.id, topicId: topic4.id, count: 2 },
-    { userId: james.id, topicId: topic4.id, count: 2 },
-    { userId: priya.id, topicId: topic4.id, count: 2 },
-    { userId: sam.id, topicId: topic4.id, count: 1 },
+    { userId: jaffar.id, topicId: topic4.id, count: 2 },
+    { userId: adanna.id, topicId: topic4.id, count: 2 },
+    { userId: kavya.id, topicId: topic4.id, count: 1 },
   ];
 
   for (const v of voteData) {
@@ -141,7 +136,7 @@ async function main() {
   }
 
   console.log("Seed data created successfully!");
-  console.log("Users created: rahul@team.com (admin), aeishwarya@team.com, james@team.com, priya@team.com, sam@team.com");
+  console.log("Users created: rahul.hareendran@dbizsolution.com (admin), aeishwarya.lokhande@dbizsolution.com, jaffar.moideen@dbizsolution.com, adanna.w@dbizsolution.com, kavya.joseph@dbizsolution.com");
   console.log("Default password: asdf1234");
 }
 
